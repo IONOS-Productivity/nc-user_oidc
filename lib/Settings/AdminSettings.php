@@ -15,11 +15,12 @@ use OCA\UserOIDC\Service\ProviderService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\IAppConfig;
+use OCP\IL10N;
 use OCP\IURLGenerator;
-use OCP\Settings\ISettings;
+use OCP\Settings\IDelegatedSettings;
 use OCP\Util;
 
-class AdminSettings implements ISettings {
+class AdminSettings implements IDelegatedSettings {
 
 	public function __construct(
 		private ProviderService $providerService,
@@ -27,6 +28,7 @@ class AdminSettings implements ISettings {
 		private IURLGenerator $urlGenerator,
 		private IAppConfig $appConfig,
 		private IInitialState $initialStateService,
+		private IL10N $l10n,
 	) {
 	}
 
@@ -37,7 +39,7 @@ class AdminSettings implements ISettings {
 		);
 		$this->initialStateService->provideInitialState(
 			'storeLoginTokenState',
-			$this->appConfig->getValueString(Application::APP_ID, 'store_login_token', '0', lazy: true) === '1'
+			$this->appConfig->getValueString(Application::APP_ID, 'store_login_token', '0') === '1'
 		);
 		$this->initialStateService->provideInitialState(
 			'providers',
@@ -59,5 +61,14 @@ class AdminSettings implements ISettings {
 
 	public function getPriority() {
 		return 90;
+	}
+
+	public function getName(): string {
+		return $this->l10n->t('OpenID Connect');
+	}
+
+	public function getAuthorizedAppConfig(): array {
+		return [
+		];
 	}
 }
